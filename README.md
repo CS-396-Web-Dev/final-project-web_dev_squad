@@ -10,7 +10,7 @@ Attached to this repo you will find:
 
 Here’s the PDF with the proposal for this project:
 
-[View Project Proposal PDF](CS 396_ Web Dev Final Project Proposal.pdf)
+[View Project Proposal PDF](CS396_Web_Dev_Final_Project_Proposal.pdf)
 
 Here’s the PDF with the mockups to this project:
 
