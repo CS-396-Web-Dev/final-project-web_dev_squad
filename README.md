@@ -15,3 +15,6 @@ Here’s the PDF with the proposal for this project:
 Here’s the PDF with the mockups to this project:
 
 [View Figma Mockups PDF](figmaMockups.pdf)
+
+Here is also the live Figma Prototype, so one can see user flow:
+[View Figma Prototype](https://embed.figma.com/proto/YVqW1YD0AgmV8y90I98aPg/webdev?node-id=2-19&node-type=canvas&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=2%3A19&embed-host=share)
