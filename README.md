@@ -10,4 +10,6 @@ Attached to this repo you will find:
 
 Project Proposal (PDF)
 
-FIGMA Mockups (PDF)
+Here’s the PDF with the mockups to this project:
+
+[View Figma Mockups PDF](figmaMockups.pdf)
