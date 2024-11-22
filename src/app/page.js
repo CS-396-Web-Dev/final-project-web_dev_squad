@@ -1,4 +1,4 @@
-"use client"; // Client Component for interactive placeholders
+"use client";
 
 import Button from "./components/Button";
 import MetricBar from "./components/MetricBar";
@@ -15,6 +15,14 @@ export default function Home() {
       <div className="text-center mb-4">
         <h1 className="text-2xl font-semibold">Tony Soprano</h1>
         <p className="text-lg">Toddler</p>
+      </div>
+
+      <div className="mb-6">
+        <img
+          src="/assets/cat/toddler_cat.png" 
+          alt="Tony Soprano the toddler cat"
+          className="w-32 h-auto"
+        />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
