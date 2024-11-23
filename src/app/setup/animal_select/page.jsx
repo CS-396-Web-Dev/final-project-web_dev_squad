@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import PetChooser from "../../components/PetChooser";
 
 export default function AnimalSelect() {
-  const [selectedPet, setSelectedPet] = useState(null);
+  const [selectedPet, setPetType] = useState(null);
   const router = useRouter();
 
   const petOptions = [
@@ -35,7 +35,7 @@ export default function AnimalSelect() {
             key={pet.name}
             pet={pet}
             isSelected={selectedPet?.name === pet.name}
-            onSelect={() => setSelectedPet(pet)}
+            onSelect={() => setPetType(pet)}
           />
         ))}
       </div>

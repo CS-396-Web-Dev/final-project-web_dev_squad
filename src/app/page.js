@@ -21,14 +21,16 @@ export default function Home() {
       </button>
 
       <div className="text-center mb-4">
-        <h1 className="text-2xl font-semibold">Tony Soprano</h1>
-        <p className="text-lg">Toddler</p>
+        <h1 className="text-2xl font-semibold">Temp</h1>{" "}
+        {/* Set this to the Pet's name from the class */}
+        <p className="text-lg">Toddler </p>{" "}
+        {/* this also probably needs changing */}
       </div>
 
       <div className="mb-6">
         <img
           src="/assets/cat/toddler_cat.png"
-          alt="Tony Soprano the toddler cat"
+          alt="Tony Soprano the toddler cat (CHANGE THIS)" // this also probably needs changing appropriatly to the pet
           className="w-32 h-auto"
         />
       </div>
