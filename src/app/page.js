@@ -2,13 +2,21 @@
 
 import Button from "./components/Button";
 import MetricBar from "./components/MetricBar";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  useEffect(() => {
+    const petData = localStorage.getItem("petData");
+    if (!petData) {
+      router.push("/setup/animal_select"); // Added this effect function to check if the pet data is active (if not transition to setup screen)
+    }
+  }, [router]);
+
   return (
     <div className="flex flex-col items-center bg-green-100 min-h-screen p-6 sm:p-10">
-      <button
-        className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
-      >
+      <button className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
         RESET
       </button>
 
@@ -19,17 +27,17 @@ export default function Home() {
 
       <div className="mb-6">
         <img
-          src="/assets/cat/toddler_cat.png" 
+          src="/assets/cat/toddler_cat.png"
           alt="Tony Soprano the toddler cat"
           className="w-32 h-auto"
         />
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-          <Button text="Feed" onClick={() => alert("Feed clicked")} />
-          <Button text="Sleep" onClick={() => alert("Sleep clicked")} />
-          <Button text="Play" onClick={() => alert("Play clicked")} />
-          <Button text="Vet" onClick={() => alert("Vet clicked")} />
+        <Button text="Feed" onClick={() => alert("Feed clicked")} />
+        <Button text="Sleep" onClick={() => alert("Sleep clicked")} />
+        <Button text="Play" onClick={() => alert("Play clicked")} />
+        <Button text="Vet" onClick={() => alert("Vet clicked")} />
       </div>
 
       <div className="p-4">
