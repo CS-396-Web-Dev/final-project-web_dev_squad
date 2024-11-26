@@ -14,9 +14,17 @@ export default function Home() {
     }
   }, [router]);
 
+  const handleReset = () => {
+    localStorage.removeItem("petData"); // Added the reset logic to remove the pet data from local storage
+    router.push("/setup/animal_select"); // Transition to the setup screen
+  }
+
   return (
     <div className="flex flex-col items-center bg-green-100 min-h-screen p-6 sm:p-10">
-      <button className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+      <button
+        onClick={handleReset} // Attached the reset logic
+        className="mb-6 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+      >
         RESET
       </button>
 
