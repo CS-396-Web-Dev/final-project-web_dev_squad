@@ -4,20 +4,33 @@ import Button from "./components/Button";
 import MetricBar from "./components/MetricBar";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { usePet } from "./context/PetContext";
 
 export default function Home() {
+  const { state, dispatch } = usePet();
   const router = useRouter();
+
   useEffect(() => {
     const petData = localStorage.getItem("petData");
     if (!petData) {
       router.push("/setup/animal_select"); // Added this effect function to check if the pet data is active (if not transition to setup screen)
+    } else if (!state.setupCompleted) {
+      // Only decrease metrics when setup is complete
+      dispatch({ type: "SET_SETUP_COMPLETED" });
     }
-  }, [router]);
+  }, [router, state.setupCompleted, dispatch]);
 
   const handleReset = () => {
     localStorage.removeItem("petData"); // Added the reset logic to remove the pet data from local storage
+    dispatch({ type: "RESET" });
     router.push("/setup/animal_select"); // Transition to the setup screen
-  }
+  };
+
+  const handleInteract = (actionType) => {
+    if (state.tokens > 0) {
+      dispatch({ type: "INTERACT", payload: { type: actionType } });
+    }
+  };
 
   return (
     <div className="flex flex-col items-center bg-green-100 min-h-screen p-6 sm:p-10">
@@ -37,28 +50,39 @@ export default function Home() {
 
       <div className="mb-6">
         <img
-          src="/assets/cat/toddler_cat.png"
-          alt="Tony Soprano the toddler cat (CHANGE THIS)" // this also probably needs changing appropriatly to the pet
+          src={`/assets/cat/${state.stage.toLowerCase()}_cat.png`} // changed to reflect proper growth stage but still needs to change according to type of pet
+          alt={`${state.name} the ${state.stage.toLowerCase()} cat (CHANGE)`}
           className="w-32 h-auto"
         />
       </div>
 
+      {/* integrated button clicks with logic from context provider */}
       <div className="grid grid-cols-2 gap-4">
-        <Button text="Feed" onClick={() => alert("Feed clicked")} />
-        <Button text="Sleep" onClick={() => alert("Sleep clicked")} />
-        <Button text="Play" onClick={() => alert("Play clicked")} />
-        <Button text="Vet" onClick={() => alert("Vet clicked")} />
+        <Button text="Feed" onClick={() => handleInteract("feed")} />
+        <Button text="Sleep" onClick={() => handleInteract("sleep")} />
+        <Button text="Play" onClick={() => handleInteract("play")} />
+        <Button text="Vet" onClick={() => handleInteract("vet")} />
       </div>
 
+      {/* displays current state values on each metric bar */}
       <div className="p-4">
         <h2 className="text-xl font-bold mb-4">Pet Metrics</h2>
         <div className="space-y-2">
-          <MetricBar label="Health" value={3} />
-          <MetricBar label="Happiness" value={5} />
-          <MetricBar label="Sleep" value={2} />
-          <MetricBar label="Energy" value={2} />
+          <MetricBar label="Health" value={state.metrics.health} />
+          <MetricBar label="Happiness" value={state.metrics.happiness} />
+          <MetricBar label="Sleep" value={state.metrics.sleep} />
+          <MetricBar label="Energy" value={state.metrics.energy} />
+          <MetricBar label="Hunger" value={state.metrics.hunger} />
         </div>
       </div>
-    </div>
-  );
+
+      <div className="mt-6">
+        {/* amount of times remaining user can interact with pet */}
+        <p className="text-lg font-semibold">Tokens: {state.tokens}</p>
+        {/* days sustained in current growth stage */}
+        <p className="text-lg font-semibold">Growth Days: {state.growthDays}</p> 
+      </div>
+
+     </div>
+   );
 }
