@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useReducer, useContext, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const PetContext = createContext();
 
@@ -55,6 +56,7 @@ function petReducer(state, action) {
       // Metrics Decrease
       newMetrics.sleep = Math.max(0, newMetrics.sleep - 1);
       newMetrics.hunger = Math.max(0, newMetrics.hunger - 1);
+      newMetrics.energy = Math.max(0, newMetrics.energy - 1); // Add energy decrement
 
       if (newMetrics.hunger < 3) {
         newMetrics.happiness = Math.max(0, newMetrics.happiness - 1);
@@ -107,6 +109,7 @@ function petReducer(state, action) {
 
 function PetProvider({ children }) {
   const [state, dispatch] = useReducer(petReducer, initialState);
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -115,6 +118,15 @@ function PetProvider({ children }) {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Naviagte back to setup if pet dies
+  useEffect(() => {
+    if (state.metrics.health === 0) {
+      localStorage.removeItem("petData");
+      dispatch({ type: "RESET" });
+      router.push("/setup/animal_select");
+    }
+  }, [state.metrics.health, router]);
 
   return (
     <PetContext.Provider value={{ state, dispatch }}>
