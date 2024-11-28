@@ -39,11 +39,11 @@ export default function BioInput() {
 
   return (
     <div className="flex flex-col items-center bg-green-100 min-h-screen p-6 sm:p-10">
-      <h1 className="text-2xl font-semibold mb-6">
+      <h1 className="text-2xl font-bold text-black mb-6">
         Input your Pet's Information below:
       </h1>
 
-      <div className="w-full max-w-md space-y-4">
+      <div className="w-full max-w-md text-black space-y-4">
         <input
           type="text"
           placeholder="Name"
