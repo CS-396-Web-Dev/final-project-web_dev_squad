@@ -1,3 +1,5 @@
+"use client";
+
 export default function PetChooser({ pet, isSelected, onSelect }) {
   return (
     <button
