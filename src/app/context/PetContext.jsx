@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useReducer, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import { useRouter } from "next/navigation";
 
 const PetContext = createContext();
@@ -11,7 +17,7 @@ const initialState = {
   metrics: { health: 5, happiness: 5, sleep: 5, energy: 5, hunger: 5 },
   tokens: 10,
   growthDays: 0,
-  setupCompleted: false, // Flag to prevent metrics from decreasing before setup
+  setupCompleted: false,
   selectedPet: null,
 };
 
@@ -66,7 +72,7 @@ function petReducer(state, action) {
       let newGrowthDays = growthDays;
       let newTokens = tokens;
 
-      // Metrics Decrease
+      // Metric changes logic
       switch (metric) {
         case "sleep":
           newMetrics.sleep = Math.max(0, newMetrics.sleep - 1);
@@ -88,25 +94,23 @@ function petReducer(state, action) {
           }
           break;
 
+        case "reset_tokens":
+          newTokens = 10;
+          break;
+
+        case "validate_growth":
+          if (
+            newMetrics.health >= 4 &&
+            newMetrics.happiness >= 3 &&
+            newMetrics.sleep >= 4 &&
+            newMetrics.energy >= 3
+          ) {
+            newGrowthDays += 1;
+          }
+          break;
+
         default:
           break;
-      }
-
-      // Token Refill
-      if (metric === "reset_tokens") {
-        newTokens = 10;
-      }
-
-      // Check for Growth
-      if (metric === "validate_growth") {
-        if (
-          newMetrics.health >= 4 &&
-          newMetrics.happiness >= 3 &&
-          newMetrics.sleep >= 4 &&
-          newMetrics.energy >= 3
-        ) {
-          newGrowthDays += 1;
-        }
       }
 
       // Stage Progression
@@ -114,9 +118,9 @@ function petReducer(state, action) {
       const currentStageIndex = growthStages.indexOf(stage);
       let newStage = stage;
 
-      if (newGrowthDays >= 10 && currentStageIndex < growthStages.length - 1) {
+      if (newGrowthDays >= 5 && currentStageIndex < growthStages.length - 1) {
         newStage = growthStages[currentStageIndex + 1];
-        newGrowthDays = 0; // Reset growth days after stage change
+        newGrowthDays = 0;
       }
 
       return {
@@ -139,7 +143,14 @@ function petReducer(state, action) {
 function PetProvider({ children }) {
   const [state, dispatch] = useReducer(petReducer, initialState);
   const router = useRouter();
+  const stateRef = useRef(state);
 
+  // Update the ref whenever the state changes (need this for the intervaks to not reset)
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  // Initialize pet data from localStorage
   useEffect(() => {
     if (!state.setupCompleted || !state.name || !state.selectedPet) {
       const storedPetData = JSON.parse(localStorage.getItem("petData"));
@@ -152,39 +163,41 @@ function PetProvider({ children }) {
   useEffect(() => {
     let tickCounter = 0;
 
+    // Set up the interval for TICK actions
     const interval = setInterval(() => {
       tickCounter += 1;
+      const currentState = stateRef.current;
 
       if (tickCounter % 24 === 0) {
-        // Decrement sleep daily
+        // Reset tokens every 24 seconds
         dispatch({ type: "TICK", payload: { metric: "reset_tokens" } });
         dispatch({ type: "TICK", payload: { metric: "validate_growth" } });
       }
 
       if (tickCounter % 12 === 0) {
-        // Decrement hunger every 12 hours
+        // Decrement hunger and sleep every 12 seconds
         dispatch({ type: "TICK", payload: { metric: "hunger" } });
         dispatch({ type: "TICK", payload: { metric: "sleep" } });
       }
 
       if (tickCounter % 6 === 0) {
-        // Decrease happiness if hunger < 3 every 6 hours
+        // Decrease happiness if hunger < 3 every 6 seconds
         dispatch({
           type: "TICK",
           payload: { metric: "happiness_if_hunger_low" },
         });
       }
 
-      if (tickCounter % 12 === 0 && state.metrics.sleep <= 2) {
-        // Decrease health if sleep <= 2 every 12 hours
+      if (tickCounter % 12 === 0 && currentState.metrics.sleep <= 2) {
+        // Decrease health if sleep <= 2 every 12 seconds
         dispatch({ type: "TICK", payload: { metric: "health_if_sleep_low" } });
       }
-    }, 1000 * 60 * 60); // For demonstration: 1000 milliseconds x 60 seconds x 60 min = 1 hour
+    }, 1000 * 60 * 60); // Interval runs every 1 hour currently (can cahnge to 1000 for each second interval)
 
     return () => clearInterval(interval);
-  }, [state.metrics.sleep, state.metrics.hunger, dispatch]);
+  }, []); // Empty dependency array ensures interval is set up only once
 
-  // Naviagte back to setup if pet dies
+  // Navigate back to setup if pet dies
   useEffect(() => {
     if (state.metrics.health === 0) {
       localStorage.removeItem("petData");
