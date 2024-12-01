@@ -169,19 +169,16 @@ function PetProvider({ children }) {
       const currentState = stateRef.current;
 
       if (tickCounter % 24 === 0) {
-        // Reset tokens every 24 seconds
         dispatch({ type: "TICK", payload: { metric: "reset_tokens" } });
         dispatch({ type: "TICK", payload: { metric: "validate_growth" } });
       }
 
       if (tickCounter % 12 === 0) {
-        // Decrement hunger and sleep every 12 seconds
         dispatch({ type: "TICK", payload: { metric: "hunger" } });
         dispatch({ type: "TICK", payload: { metric: "sleep" } });
       }
 
       if (tickCounter % 6 === 0) {
-        // Decrease happiness if hunger < 3 every 6 seconds
         dispatch({
           type: "TICK",
           payload: { metric: "happiness_if_hunger_low" },
@@ -189,13 +186,12 @@ function PetProvider({ children }) {
       }
 
       if (tickCounter % 12 === 0 && currentState.metrics.sleep <= 2) {
-        // Decrease health if sleep <= 2 every 12 seconds
         dispatch({ type: "TICK", payload: { metric: "health_if_sleep_low" } });
       }
     }, 1000 * 60 * 60); // Interval runs every 1 hour currently (can cahnge to 1000 for each second interval)
 
     return () => clearInterval(interval);
-  }, []); // Empty dependency array ensures interval is set up only once
+  }, []); // Empty dependency array ensures interval is set up only once (GPT help used for this)
 
   // Navigate back to setup if pet dies
   useEffect(() => {
