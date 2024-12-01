@@ -29,18 +29,21 @@ function petReducer(state, action) {
         if (type === "play") {
           newMetrics.energy -= 1;
           newMetrics.happiness += 1;
+          newTokens -= 1;
         } else if (type === "sleep") {
           newMetrics.sleep += 1;
+          newTokens -= 1;
         } else if (type === "feed") {
           newMetrics.hunger += 1;
           newMetrics.energy += 1;
-        } else if (type === "vet") {
+          newTokens -= 1;
+        } else if (type === "vet" && newTokens >= 3) {
           newMetrics.health = 5;
           newMetrics.happiness = 3;
           newMetrics.sleep = 5;
           newMetrics.energy = 3;
+          newTokens -= 3;
         }
-        newTokens -= 1;
       }
       return { ...state, metrics: newMetrics, tokens: newTokens };
     }
@@ -49,35 +52,52 @@ function petReducer(state, action) {
       if (!state.setupCompleted) return state;
 
       const { metrics, growthDays, stage, tokens } = state;
+      const { metric } = action.payload;
       let newMetrics = { ...metrics };
       let newGrowthDays = growthDays;
       let newTokens = tokens;
 
       // Metrics Decrease
-      newMetrics.sleep = Math.max(0, newMetrics.sleep - 1);
-      newMetrics.hunger = Math.max(0, newMetrics.hunger - 1);
-      newMetrics.energy = Math.max(0, newMetrics.energy - 1); // Add energy decrement
+      switch (metric) {
+        case "sleep":
+          newMetrics.sleep = Math.max(0, newMetrics.sleep - 1);
+          break;
 
-      if (newMetrics.hunger < 3) {
-        newMetrics.happiness = Math.max(0, newMetrics.happiness - 1);
-      }
-      if (newMetrics.sleep <= 2) {
-        newMetrics.health = Math.max(0, newMetrics.health - 1);
+        case "hunger":
+          newMetrics.hunger = Math.max(0, newMetrics.hunger - 1);
+          break;
+
+        case "happiness_if_hunger_low":
+          if (newMetrics.hunger < 3) {
+            newMetrics.happiness = Math.max(0, newMetrics.happiness - 1);
+          }
+          break;
+
+        case "health_if_sleep_low":
+          if (newMetrics.sleep <= 2) {
+            newMetrics.health = Math.max(0, newMetrics.health - 1);
+          }
+          break;
+
+        default:
+          break;
       }
 
       // Token Refill
-      if (newTokens < 10) {
-        newTokens += 2; // Increase tokens up to a maximum of 10
+      if (metric === "reset_tokens") {
+        newTokens = 10;
       }
 
       // Check for Growth
-      if (
-        newMetrics.health >= 4 &&
-        newMetrics.happiness >= 3 &&
-        newMetrics.sleep >= 4 &&
-        newMetrics.energy >= 3
-      ) {
-        newGrowthDays += 1;
+      if (metric === "validate_growth") {
+        if (
+          newMetrics.health >= 4 &&
+          newMetrics.happiness >= 3 &&
+          newMetrics.sleep >= 4 &&
+          newMetrics.energy >= 3
+        ) {
+          newGrowthDays += 1;
+        }
       }
 
       // Stage Progression
@@ -85,7 +105,7 @@ function petReducer(state, action) {
       const currentStageIndex = growthStages.indexOf(stage);
       let newStage = stage;
 
-      if (newGrowthDays >= 3 && currentStageIndex < growthStages.length - 1) {
+      if (newGrowthDays >= 10 && currentStageIndex < growthStages.length - 1) {
         newStage = growthStages[currentStageIndex + 1];
         newGrowthDays = 0; // Reset growth days after stage change
       }
@@ -112,12 +132,39 @@ function PetProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
+    let tickCounter = 0;
+
     const interval = setInterval(() => {
-      dispatch({ type: "TICK" });
-    }, 60 * 60);
+      tickCounter += 1;
+
+      if (tickCounter % 24 === 0) {
+        // Decrement sleep daily
+        dispatch({ type: "TICK", payload: { metric: "sleep" } });
+        dispatch({ type: "TICK", payload: { metric: "reset_tokens" } });
+        dispatch({ type: "TICK", payload: { metric: "validate_growth" } });
+      }
+
+      if (tickCounter % 12 === 0) {
+        // Decrement hunger every 12 hours
+        dispatch({ type: "TICK", payload: { metric: "hunger" } });
+      }
+
+      if (tickCounter % 6 === 0) {
+        // Decrease happiness if hunger < 3 every 6 hours
+        dispatch({
+          type: "TICK",
+          payload: { metric: "happiness_if_hunger_low" },
+        });
+      }
+
+      if (tickCounter % 12 === 0 && state.metrics.sleep <= 2) {
+        // Decrease health if sleep <= 2 every 12 hours
+        dispatch({ type: "TICK", payload: { metric: "health_if_sleep_low" } });
+      }
+    }, 1000 * 60 * 60); // For demonstration: 1000 milliseconds x 60 seconds x 60 min = 1 hour
 
     return () => clearInterval(interval);
-  }, []);
+  }, [state.metrics.sleep, state.metrics.hunger, dispatch]);
 
   // Naviagte back to setup if pet dies
   useEffect(() => {

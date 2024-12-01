@@ -9,11 +9,11 @@ export default function AnimalSelect() {
   const router = useRouter();
 
   const petOptions = [
-    { name: "Dog", img: "/assets/dog/baby_dog.png" },
-    { name: "Cat", img: "/assets/cat/baby_cat.png" },
-    { name: "Fish", img: "/assets/fish/baby_fish.png" },
-    { name: "Bird", img: "/assets/chicken/baby_chicken.png" },
-    { name: "Turtle", img: "/assets/turtle/baby_turtle.png" },
+    { name: "dog", img: "/assets/dog/baby_dog.png" },
+    { name: "cat", img: "/assets/cat/baby_cat.png" },
+    { name: "fish", img: "/assets/fish/baby_fish.png" },
+    { name: "bird", img: "/assets/chicken/baby_chicken.png" },
+    { name: "turtle", img: "/assets/turtle/baby_turtle.png" },
   ];
 
   const handleNext = () => {

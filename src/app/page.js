@@ -80,9 +80,8 @@ export default function Home() {
         {/* amount of times remaining user can interact with pet */}
         <p className="text-lg font-semibold">Tokens: {state.tokens}</p>
         {/* days sustained in current growth stage */}
-        <p className="text-lg font-semibold">Growth Days: {state.growthDays}</p> 
+        <p className="text-lg font-semibold">Growth Days: {state.growthDays}</p>
       </div>
-
-     </div>
-   );
+    </div>
+  );
 }

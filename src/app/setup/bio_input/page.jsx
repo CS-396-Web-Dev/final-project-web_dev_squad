@@ -30,6 +30,7 @@ export default function BioInput() {
       hometown,
       bio,
     };
+
     // Redirects to main screen to view pet's metrics after setting the pet data (check to see if this works, is buggy rn)
     localStorage.setItem("petData", JSON.stringify(petData));
     router.push("/");
