@@ -12,7 +12,7 @@ export default function AnimalSelect() {
     { name: "dog", img: "/assets/dog/baby_dog.png" },
     { name: "cat", img: "/assets/cat/baby_cat.png" },
     { name: "fish", img: "/assets/fish/baby_fish.png" },
-    { name: "bird", img: "/assets/chicken/baby_chicken.png" },
+    { name: "chicken", img: "/assets/chicken/baby_chicken.png" },
     { name: "turtle", img: "/assets/turtle/baby_turtle.png" },
   ];
 

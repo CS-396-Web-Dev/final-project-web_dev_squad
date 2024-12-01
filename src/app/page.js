@@ -21,7 +21,7 @@ export default function Home() {
   }, [router, state.setupCompleted, dispatch]);
 
   const handleReset = () => {
-    localStorage.removeItem("petData"); // Added the reset logic to remove the pet data from local storage
+    localStorage.clear();
     dispatch({ type: "RESET" });
     router.push("/setup/animal_select"); // Transition to the setup screen
   };
@@ -42,18 +42,22 @@ export default function Home() {
       </button>
 
       <div className="text-center mb-4">
-        <h1 className="text-2xl font-semibold">Temp</h1>{" "}
-        {/* Set this to the Pet's name from the class */}
-        <p className="text-lg">Toddler </p>{" "}
-        {/* this also probably needs changing */}
+        <h1 className="text-2xl font-semibold">{state.name}</h1>
+        <p className="text-lg">{state.stage}</p>
       </div>
 
       <div className="mb-6">
-        <img
-          src={`/assets/cat/${state.stage.toLowerCase()}_cat.png`} // changed to reflect proper growth stage but still needs to change according to type of pet
-          alt={`${state.name} the ${state.stage.toLowerCase()} cat (CHANGE)`}
-          className="w-32 h-auto"
-        />
+        {state.selectedPet && (
+          <img
+            src={`/assets/${
+              state.selectedPet.name
+            }/${state.stage.toLowerCase()}_${state.selectedPet.name}.png`}
+            alt={`${state.name} the ${state.stage.toLowerCase()} ${
+              state.selectedPet.name
+            }`}
+            className="w-32 h-auto"
+          />
+        )}
       </div>
 
       {/* integrated button clicks with logic from context provider */}

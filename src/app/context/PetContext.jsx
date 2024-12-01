@@ -12,10 +12,19 @@ const initialState = {
   tokens: 10,
   growthDays: 0,
   setupCompleted: false, // Flag to prevent metrics from decreasing before setup
+  selectedPet: null,
 };
 
 function petReducer(state, action) {
   switch (action.type) {
+    case "INITIALIZE_PET":
+      return {
+        ...state,
+        name: action.payload.petName,
+        selectedPet: action.payload.selectedPet,
+        setupCompleted: true,
+      };
+
     case "RESET":
       return { ...initialState };
 
@@ -132,6 +141,15 @@ function PetProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
+    if (!state.setupCompleted || !state.name || !state.selectedPet) {
+      const storedPetData = JSON.parse(localStorage.getItem("petData"));
+      if (storedPetData) {
+        dispatch({ type: "INITIALIZE_PET", payload: storedPetData });
+      }
+    }
+  }, [state.setupCompleted, state.name, state.selectedPet]);
+
+  useEffect(() => {
     let tickCounter = 0;
 
     const interval = setInterval(() => {
@@ -139,7 +157,6 @@ function PetProvider({ children }) {
 
       if (tickCounter % 24 === 0) {
         // Decrement sleep daily
-        dispatch({ type: "TICK", payload: { metric: "sleep" } });
         dispatch({ type: "TICK", payload: { metric: "reset_tokens" } });
         dispatch({ type: "TICK", payload: { metric: "validate_growth" } });
       }
@@ -147,6 +164,7 @@ function PetProvider({ children }) {
       if (tickCounter % 12 === 0) {
         // Decrement hunger every 12 hours
         dispatch({ type: "TICK", payload: { metric: "hunger" } });
+        dispatch({ type: "TICK", payload: { metric: "sleep" } });
       }
 
       if (tickCounter % 6 === 0) {
